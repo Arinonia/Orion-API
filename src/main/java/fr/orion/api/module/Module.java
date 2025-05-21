@@ -6,5 +6,6 @@ public interface Module {
     void onReload();
     void onLoad();
     void onUnload();
+    boolean isEnabled();
     ModuleDescriptor getModuleDescriptor();
 }
