@@ -1,0 +1,17 @@
+plugins {
+    id 'java'
+}
+
+group = 'fr.orion'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("net.dv8tion:JDA:5.5.1")
+    implementation("org.yaml:snakeyaml:2.4")
+}
+
+compileJava.options.encoding("UTF-8")
