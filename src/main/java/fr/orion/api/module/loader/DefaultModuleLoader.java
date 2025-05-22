@@ -191,10 +191,10 @@ public class DefaultModuleLoader implements ModuleManager {
 
             Module module = moduleClass.getDeclaredConstructor().newInstance();
 
-            module.onLoad(/*jda, descriptor*/);
+            module.onLoad(this.jda, descriptor);
 
             ModuleInfo moduleInfo = new ModuleInfo(descriptor, jarPath, module, urlClassLoader);
-            modulesById.put(descriptor.id(), moduleInfo);
+            this.modulesById.put(descriptor.id(), moduleInfo);
 
             logger.info("Successfully loaded module: {}", descriptor.name());
         } catch (ReflectiveOperationException e) {
@@ -327,38 +327,31 @@ public class DefaultModuleLoader implements ModuleManager {
 
         boolean wasEnabled = info.module().isEnabled();
 
-        // Désactiver le module
         if (wasEnabled && !disableModule(moduleId)) {
             logger.error("Failed to disable module {} during reload", moduleId);
             return false;
         }
 
-        // Sauvegarder les informations importantes
         Path jarPath = info.jarPath();
         ModuleDescriptor descriptor = info.descriptor();
 
-        // Déclencher l'événement onUnload
         try {
             info.module().onUnload();
         } catch (Exception e) {
             logger.error("Error during module unload: {}", moduleId, e);
         }
 
-        // Fermer le ClassLoader
         try {
             info.classLoader().close();
         } catch (IOException e) {
             logger.error("Failed to close ClassLoader for module {}", moduleId, e);
         }
 
-        // Supprimer le module de la liste
         this.modulesById.remove(moduleId);
 
         try {
-            // Recharger le module
             loadModule(descriptor, jarPath);
 
-            // Réactiver le module si nécessaire
             if (wasEnabled) {
                 return enableModule(moduleId);
             }

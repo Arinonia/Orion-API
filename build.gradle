@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'fr.orion'
+group = 'fr.orion.api'
 version = '0.0.1-SNAPSHOT'
 
 repositories {
