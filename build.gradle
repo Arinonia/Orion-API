@@ -1,9 +1,18 @@
 plugins {
     id 'java'
+    id 'maven-publish'
 }
 
-group = 'fr.orion.api'
-version = '0.0.1-SNAPSHOT'
+group = 'fr.orion'
+version = '0.1.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    withJavadocJar()
+    withSourcesJar()
+}
 
 repositories {
     mavenCentral()
@@ -14,4 +23,48 @@ dependencies {
     implementation("org.yaml:snakeyaml:2.4")
 }
 
-compileJava.options.encoding("UTF-8")
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+javadoc.options.encoding = 'UTF-8'
+javadoc.options.charSet = 'UTF-8'
+
+javadoc {
+    options {
+        encoding = 'UTF-8'
+        charSet = 'UTF-8'
+        author = true
+        version = true
+        use = true
+        windowTitle = "Orion Discord Bot API"
+        docTitle = "Orion Discord Bot API"
+        addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'fr.orion'
+            artifactId = 'orion-api'
+            version = '0.1.0-SNAPSHOT'
+            from components.java
+
+            pom {
+                name = 'Orion Discord Bot API'
+                description = 'Clean, modular Discord bot API framework'
+                url = 'https://github.com/Arinonia/orion-api'
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/arinonia/orion-api"
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+}

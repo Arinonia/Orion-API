@@ -33,7 +33,7 @@ import java.util.Map;
  * @param softDependencies   List of optional module IDs
  * @param rawData            Additional unprocessed configuration data
  *
- * @throws IllegalArgumentException if {@code id} or {@code main} are invalid
+ * throws IllegalArgumentException if {@code id} or {@code main} are invalid
  *
  * @see AbstractModule
  * @author Arinonia

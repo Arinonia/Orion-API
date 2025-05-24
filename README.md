@@ -80,7 +80,7 @@ Add to your `build.gradle`:
 
 ```gradle
 dependencies {
-    // not deployed yet, download from the github releases.
+    implementation 'fr.orion:orion-api:0.1.0-SNAPSHOT'
 }
 ```
 
@@ -90,7 +90,9 @@ Add to your `pom.xml`:
 
 ```xml
 <dependency>
-    <!-- not deployed yet, download from the github releases.-->
+   <groupId>fr.orion</groupId>
+   <artifactId>orion-api</artifactId>
+   <version>0.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
