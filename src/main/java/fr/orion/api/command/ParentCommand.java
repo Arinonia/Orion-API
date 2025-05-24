@@ -65,6 +65,7 @@ public abstract class ParentCommand implements Command {
 
     public interface SubcommandHandler {
         void execute(SlashCommandInteractionEvent event);
+        SubcommandData getSubcommandData();
     }
 
     private record SubcommandInfo(SubcommandData subcommandData, SubcommandHandler handler) {}

@@ -4,6 +4,40 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents the metadata descriptor for a module.
+ * <p>
+ *
+ * <h2>Example YAML structure:</h2>
+ * <pre>{@code
+ * id: "my_module"
+ * name: "My Awesome Module"
+ * version: "1.0.0"
+ * main: "com.example.mymodule.ModuleMain"
+ * dependencies:
+ *   - "required_module"
+ * softDependencies: "optional_module"
+ * custom_field: "extra_data"
+ * }
+ * </pre>
+ *
+ * @param id                 The unique module identifier (lowercase, no spaces, required)
+ * @param name               Human-readable module name
+ * @param version            Module version (default: "1.0.0")
+ * @param main               Fully qualified main class name (required)
+ * @param description        Brief module description
+ * @param author             Module author(s)
+ * @param website            Project website URL
+ * @param license            Distribution license
+ * @param dependencies       List of hard required module IDs
+ * @param softDependencies   List of optional module IDs
+ * @param rawData            Additional unprocessed configuration data
+ *
+ * @throws IllegalArgumentException if {@code id} or {@code main} are invalid
+ *
+ * @see AbstractModule
+ * @author Arinonia
+ */
 public record ModuleDescriptor(
         String id,
         String name,

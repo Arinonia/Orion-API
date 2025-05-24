@@ -1,10 +1,11 @@
 package fr.orion.api.module.loader;
 
+import fr.orion.api.Bot;
+import fr.orion.api.module.AbstractModule;
 import fr.orion.api.module.Module;
 import fr.orion.api.module.ModuleDescriptor;
 import fr.orion.api.module.ModuleManager;
 import fr.orion.api.module.loader.exception.ModuleException;
-import net.dv8tion.jda.api.JDA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
@@ -26,11 +27,11 @@ public class DefaultModuleLoader implements ModuleManager {
 
     private final Map<String, ModuleInfo> modulesById = new ConcurrentHashMap<>();
     private final Path modulesDirectory;
-    private final JDA jda;
+    private final Bot bot;
 
-    public DefaultModuleLoader(Path modulesDirectory, JDA jda) {
+    public DefaultModuleLoader(Path modulesDirectory, Bot bot) {
         this.modulesDirectory = modulesDirectory;
-        this.jda = jda;
+        this.bot = bot;
 
         try {
             Files.createDirectories(modulesDirectory);
@@ -59,6 +60,7 @@ public class DefaultModuleLoader implements ModuleManager {
                         descriptors.put(descriptor.id(), descriptor);
                         jarPaths.put(descriptor.id(), jarPath);
                         logger.debug("Loaded module descriptor for module: {}", descriptor.id());
+                        logger.debug("Module descriptor: {}", descriptor);
                     }
                 } catch (ModuleException e) {
                     logger.error("Failed to load module descriptor from JAR: {}", jarPath.getFileName(), e);
@@ -166,8 +168,7 @@ public class DefaultModuleLoader implements ModuleManager {
     }
 
     protected void loadModule(ModuleDescriptor descriptor, Path jarPath) throws ModuleException {
-        logger.info("Loading module: {} v{}",
-                descriptor.name(), descriptor.version());
+        logger.info("Loading module: {} v{}", descriptor.name(), descriptor.version());
 
         if (this.modulesById.containsKey(descriptor.id())) {
             throw new ModuleException("Module already loaded: " + descriptor.id());
@@ -191,7 +192,12 @@ public class DefaultModuleLoader implements ModuleManager {
 
             Module module = moduleClass.getDeclaredConstructor().newInstance();
 
-            module.onLoad(this.jda, descriptor);
+            if (!(module instanceof AbstractModule)) {
+                throw new ModuleException("Module must extend AbstractModule: " + descriptor.main());
+            }
+
+            AbstractModule abstractModule = (AbstractModule) module;
+            abstractModule.init(this.bot, descriptor);
 
             ModuleInfo moduleInfo = new ModuleInfo(descriptor, jarPath, module, urlClassLoader);
             this.modulesById.put(descriptor.id(), moduleInfo);
@@ -209,11 +215,13 @@ public class DefaultModuleLoader implements ModuleManager {
         if (classLoader != null) {
             try {
                 classLoader.close();
+                logger.debug("ClassLoader closed successfully");
             } catch (IOException e) {
                 logger.error("Failed to close ClassLoader", e);
             }
         }
     }
+
     @Override
     public int enableModules() {
         int enabledModules = 0;
@@ -228,7 +236,10 @@ public class DefaultModuleLoader implements ModuleManager {
     @Override
     public int disableModules() {
         int disabledModules = 0;
-        for (String moduleId : this.modulesById.keySet()) {
+        List<String> moduleIds = new ArrayList<>(this.modulesById.keySet());
+        Collections.reverse(moduleIds);
+
+        for (String moduleId : moduleIds) {
             if (disableModule(moduleId)) {
                 disabledModules++;
             }
@@ -256,12 +267,17 @@ public class DefaultModuleLoader implements ModuleManager {
 
                 if (dependencyInfo != null && !dependencyInfo.module().isEnabled()) {
                     logger.info("Enabling dependency {} for module {}", dependencyId, moduleId);
-                    enableModule(dependencyId);
+                    if (!enableModule(dependencyId)) {
+                        throw new ModuleException("Failed to enable dependency: " + dependencyId);
+                    }
                 }
             }
 
             logger.info("Enabling module: {}", info.descriptor().name());
-            info.module().onEnable();
+
+            AbstractModule abstractModule = (AbstractModule) info.module();
+            abstractModule.enable();
+
             logger.info("Module {} enabled successfully", info.descriptor().name());
             return true;
         } catch (Exception e) {
@@ -289,13 +305,19 @@ public class DefaultModuleLoader implements ModuleManager {
             logger.info("Module {} is required by: {}", moduleId, dependentModules);
 
             for (String dependentId : dependentModules) {
-                disableModule(dependentId);
+                if (!disableModule(dependentId)) {
+                    logger.error("Failed to disable dependent module: {}", dependentId);
+                    return false;
+                }
             }
         }
 
         try {
             logger.info("Disabling module: {}", info.descriptor().name());
-            info.module().onDisable();
+
+            AbstractModule abstractModule = (AbstractModule) info.module();
+            abstractModule.disable();
+
             logger.info("Module {} disabled successfully", info.descriptor().name());
             return true;
         } catch (Exception e) {
@@ -335,19 +357,10 @@ public class DefaultModuleLoader implements ModuleManager {
         Path jarPath = info.jarPath();
         ModuleDescriptor descriptor = info.descriptor();
 
-        try {
-            info.module().onUnload();
-        } catch (Exception e) {
-            logger.error("Error during module unload: {}", moduleId, e);
+        if (!unloadModule(moduleId)) {
+            logger.error("Failed to unload module {} during reload", moduleId);
+            return false;
         }
-
-        try {
-            info.classLoader().close();
-        } catch (IOException e) {
-            logger.error("Failed to close ClassLoader for module {}", moduleId, e);
-        }
-
-        this.modulesById.remove(moduleId);
 
         try {
             loadModule(descriptor, jarPath);
@@ -361,6 +374,66 @@ public class DefaultModuleLoader implements ModuleManager {
             logger.error("Failed to reload module {}: {}", moduleId, e.getMessage(), e);
             return false;
         }
+    }
+
+    @Override
+    public boolean unloadModule(String moduleId) {
+        ModuleInfo info = this.modulesById.get(moduleId);
+
+        if (info == null) {
+            logger.warn("Cannot unload unknown module: {}", moduleId);
+            return false;
+        }
+
+        if (info.module().isEnabled()) {
+            if (!disableModule(moduleId)) {
+                logger.error("Failed to disable module {} before unloading", moduleId);
+                return false;
+            }
+        }
+
+        List<String> dependentModules = findDependentModules(moduleId);
+        if (!dependentModules.isEmpty()) {
+            logger.error("Cannot unload module {} - required by: {}", moduleId, dependentModules);
+            return false;
+        }
+
+        try {
+            logger.info("Unloading module: {}", info.descriptor().name());
+
+            AbstractModule abstractModule = (AbstractModule) info.module();
+            abstractModule.onUnload();
+
+            this.modulesById.remove(moduleId);
+
+            closeClassLoader(info.classLoader());
+
+            System.gc();
+
+            logger.info("Module {} unloaded successfully", info.descriptor().name());
+            return true;
+
+        } catch (Exception e) {
+            logger.error("Error during module unload: {}", moduleId, e);
+            this.modulesById.put(moduleId, info);
+            return false;
+        }
+    }
+
+    @Override
+    public void unloadAllModules() {
+        logger.info("Unloading all modules...");
+
+        disableModules();
+
+        List<String> moduleIds = new ArrayList<>(this.modulesById.keySet());
+        Collections.reverse(moduleIds);
+
+        for (String moduleId : moduleIds) {
+            unloadModule(moduleId);
+        }
+
+        logger.info("All modules unloaded");
     }
 
     @Override
@@ -396,7 +469,6 @@ public class DefaultModuleLoader implements ModuleManager {
                 new ArrayList<>(info.descriptor().dependencies()) :
                 Collections.emptyList();
     }
-
 
     protected record ModuleInfo(ModuleDescriptor descriptor, Path jarPath, Module module, URLClassLoader classLoader) {}
 }

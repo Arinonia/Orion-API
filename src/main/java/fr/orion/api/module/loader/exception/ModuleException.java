@@ -1,8 +1,5 @@
 package fr.orion.api.module.loader.exception;
 
-/**
- *
- */
 public class ModuleException extends RuntimeException {
 
     public ModuleException(String message) {
