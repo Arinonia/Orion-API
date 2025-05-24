@@ -16,13 +16,21 @@ import java.util.function.Consumer;
 public class ConfirmationSystem extends ListenerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(ConfirmationSystem.class);
     private static final Map<String, ConfirmationData> confirmationSystems = new ConcurrentHashMap<>();
-
+    private static ConfirmationSystem instance;
     private static final String confirmPrefix = "confirm:";
     private static final String cancelPrefix = "cancel:";
+
+
+    public ConfirmationSystem() {
+        instance = this;
+    }
 
     public static ConfirmationMessage createConfirmation(String message,
                                                          Consumer<ButtonInteractionEvent> onConfirm,
                                                          Consumer<ButtonInteractionEvent> onCancel) {
+        if (instance == null) {
+            throw new IllegalStateException("ConfirmationSystem not initialized. Make sure it's registered as an event listener.");
+        }
         String confirmationId = UUID.randomUUID().toString();
 
         confirmationSystems.put(confirmationId, new ConfirmationData(onConfirm, onCancel));

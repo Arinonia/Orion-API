@@ -4,6 +4,7 @@ import fr.orion.api.Bot;
 import fr.orion.api.command.Command;
 import fr.orion.api.config.ModuleConfig;
 import fr.orion.api.config.YamlModuleConfig;
+import fr.orion.api.permission.PermissionManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.hooks.EventListener;
 import org.slf4j.Logger;
@@ -73,12 +74,13 @@ public abstract class AbstractModule implements Module {
             return;
         }
 
+        this.enabled = false;
+
         try {
             onDisable();
         } catch (Exception e) {
             logger.error("Error disabling module {}", this.descriptor.id(), e);
         }
-
         unregisterAllCommands();
         unregisterAllListeners();
     }
@@ -121,6 +123,7 @@ public abstract class AbstractModule implements Module {
     public ModuleConfig getConfig() {
         return this.config;
     }
+
 
     // ====== Utility methods ======
 
