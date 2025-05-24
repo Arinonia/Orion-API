@@ -124,7 +124,10 @@ public abstract class AbstractModule implements Module {
         return this.config;
     }
 
-
+    @Override
+    public PermissionManager getPermissionManager() {
+        return this.bot.getPermissionManager();
+    }
     // ====== Utility methods ======
 
     /**

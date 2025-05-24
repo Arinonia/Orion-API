@@ -3,6 +3,7 @@ package fr.orion.api;
 import fr.orion.api.command.CommandRegistry;
 import fr.orion.api.event.EventRegistry;
 import fr.orion.api.module.ModuleManager;
+import fr.orion.api.permission.PermissionManager;
 import net.dv8tion.jda.api.JDA;
 
 public interface Bot {
@@ -26,4 +27,10 @@ public interface Bot {
      * @return The module manager instance
      */
     ModuleManager getModuleManager();
+
+    /**
+     * Get the permission manager.
+     * @return The permission manager instance
+     */
+    PermissionManager getPermissionManager();
 }

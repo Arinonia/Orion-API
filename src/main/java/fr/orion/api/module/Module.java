@@ -2,7 +2,9 @@ package fr.orion.api.module;
 
 import fr.orion.api.Bot;
 import fr.orion.api.config.ModuleConfig;
+import fr.orion.api.permission.PermissionManager;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Member;
 
 import java.nio.file.Path;
 
@@ -57,4 +59,26 @@ public interface Module {
      * @return The module configuration
      */
     ModuleConfig getConfig();
+
+    /**
+     * Get the permission manager for this module.
+     * @return The permission manager instance
+     */
+    PermissionManager getPermissionManager();
+
+    /**
+     * Check if a member has a specific permission for this module.
+     * This is a convenience method that prefixes the permission with the module ID.
+     *
+     * @param member The member to check
+     * @param permission The permission to check (without module prefix)
+     * @return true if the member has the permission
+     */
+    default boolean hasPermission(Member member, String permission) {
+        if (getModuleDescriptor() == null) {
+            return false;
+        }
+        String fullPermission = getModuleDescriptor().id() + "." + permission;
+        return getPermissionManager().hasPermission(member, fullPermission);
+    }
 }
