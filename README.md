@@ -4,7 +4,7 @@
 [![JDA](https://img.shields.io/badge/JDA-5.5.1-blue.svg)](https://github.com/discord-jda/JDA)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-0.0.1--SNAPSHOT-red.svg)]()
-
+[![Release](https://img.shields.io/github/v/release/Arinonia/orion-api?include_prereleases)](https://github.com/Arinonia/orion-api/releases)
 A clean, modular Discord bot API framework built with Java and JDA. Orion-API provides the core interfaces and contracts for building scalable Discord bots with a plugin-like module system, comprehensive permission management, and hot-reloadable components.
 
 > **Note**: This is the API layer providing interfaces and contracts. For a complete implementation, see [Orion-Core](https://github.com/Arinonia/orion-core).
@@ -79,6 +79,11 @@ fr.orion.api/              # Pure API interfaces
 Add to your `build.gradle`:
 
 ```gradle
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
 dependencies {
     implementation 'fr.orion:orion-api:0.1.0-SNAPSHOT'
 }
@@ -89,11 +94,20 @@ dependencies {
 Add to your `pom.xml`:
 
 ```xml
+<repositories>
+   <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+   </repository>
+</repositories>
+
+<dependencies>
 <dependency>
    <groupId>fr.orion</groupId>
    <artifactId>orion-api</artifactId>
    <version>0.1.0-SNAPSHOT</version>
 </dependency>
+</dependencies>
 ```
 
 ## 🧩 Core Concepts
