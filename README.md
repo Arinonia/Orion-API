@@ -525,6 +525,11 @@ Orion-API is a pure interface library. To use it, you need an implementation:
 - File-based configuration system
 
 ```gradle
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
 dependencies {
     implementation 'fr.orion:orion-api:0.0.1-SNAPSHOT'
 }
@@ -799,6 +804,7 @@ When proposing API changes:
 
 ### Community
 
+- [ ] **Community Modules**: Showcase popular community modules
 - [ ] **Examples Repository**: More comprehensive examples
 - [ ] **Best Practices**: Guidelines for API usage
 - [ ] **Migration Tools**: Tools for upgrading between API versions
