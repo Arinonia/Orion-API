@@ -101,17 +101,32 @@ Add to your `pom.xml`:
 
 ```xml
 <repositories>
-   <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-   </repository>
+    <repository>
+        <id>jitpack</id>
+        <url>https://jitpack.io</url>
+    </repository>
 </repositories>
 
 <dependencies>
 <dependency>
-   <groupId>com.github.Arinonia</groupId>
-   <artifactId>orion-api</artifactId>
-   <version>v0.1.0-beta</version>
+    <groupId>com.github.Arinonia</groupId>
+    <artifactId>orion-api</artifactId>
+    <version>v0.1.0-beta</version>
+</dependency>
+<dependency>
+    <groupId>net.dv8tion</groupId>
+    <artifactId>JDA</artifactId>
+    <version>5.5.1</version>
+</dependency>
+<dependency>
+    <groupId>org.yaml</groupId>
+    <artifactId>snakeyaml</artifactId>
+    <version>2.4</version>
+</dependency>
+<dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>1.5.13</version>
 </dependency>
 </dependencies>
 ```
