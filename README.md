@@ -88,7 +88,10 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.Arinonia:orion-api:v0.1.0-beta'
+    implementation("com.github.Arinonia:orion-api:v0.1.0-beta")
+    implementation("net.dv8tion:JDA:5.5.1")
+    implementation("org.yaml:snakeyaml:2.4")
+    implementation("ch.qos.logback:logback-classic:1.5.13")
 }
 ```
 
