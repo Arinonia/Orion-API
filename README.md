@@ -88,7 +88,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'fr.orion:orion-api:0.1.0-SNAPSHOT'
+    implementation 'com.github.Arinonia:orion-api:v0.1.0-beta'
 }
 ```
 
@@ -106,9 +106,9 @@ Add to your `pom.xml`:
 
 <dependencies>
 <dependency>
-   <groupId>fr.orion</groupId>
+   <groupId>com.github.Arinonia</groupId>
    <artifactId>orion-api</artifactId>
-   <version>0.1.0-SNAPSHOT</version>
+   <version>v0.1.0-beta</version>
 </dependency>
 </dependencies>
 ```
@@ -519,7 +519,7 @@ Orion-API is a pure interface library. To use it, you need an implementation:
 
 ### Official Implementation
 
-**[Orion-Core](https://github.com/yourusername/orion-core)** - The official implementation providing:
+**[Orion-Core](https://github.com/Arinonia/orion-core)** - The official implementation providing:
 
 - Complete bot implementation with all API contracts
 - YAML-based permission storage
@@ -534,7 +534,10 @@ repositories {
 }
 
 dependencies {
-    implementation 'fr.orion:orion-api:0.0.1-SNAPSHOT'
+    implementation("com.github.Arinonia:orion-api:v0.1.0-beta")
+    implementation("net.dv8tion:JDA:5.5.1")
+    implementation("org.yaml:snakeyaml:2.4")
+    implementation("ch.qos.logback:logback-classic:1.5.13")
 }
 ```
 
