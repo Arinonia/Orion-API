@@ -3,7 +3,7 @@
 [![Java](https://img.shields.io/badge/Java-17%2B-orange.svg)](https://openjdk.java.net/)
 [![JDA](https://img.shields.io/badge/JDA-5.5.1-blue.svg)](https://github.com/discord-jda/JDA)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-0.1.0--beta-red.svg)]()
+[![Version](https://img.shields.io/badge/Version-1.0.0-red.svg)]()
 [![CI](https://github.com/Arinonia/orion-api/workflows/CI/badge.svg)](https://github.com/Arinonia/orion-api/actions)
 [![Release](https://img.shields.io/github/v/release/Arinonia/orion-api?include_prereleases)](https://github.com/Arinonia/orion-api/releases)
 [![Issues](https://img.shields.io/github/issues/Arinonia/orion-api)](https://github.com/Arinonia/orion-api/issues)
